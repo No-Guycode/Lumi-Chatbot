@@ -205,20 +205,21 @@
         chatBox.innerHTML += `<p><strong>Error:</strong> Failed to fetch response.</p>`;
     });
 }
+
     function updateDateTime() {
-        const now = new Date();
-        const formattedDateTime = now.toLocaleString(); // Formats based on the user's locale
-        document.getElementById("date-time").textContent = formattedDateTime;
+        try {
+            const now = new Date();
+            const formattedDateTime = now.toLocaleString(); // Formats based on the user's locale
+            document.getElementById("date-time").textContent = formattedDateTime;
+        } catch (error) {
+            console.error("Error updating date & time:", error);
+            document.getElementById("date-time").textContent = "Error loading time.";
+        }
     }
 
-    // Update time every second
-    setInterval(updateDateTime, 1000);
-
-    // Set time immediately on page load
+    // Run updateDateTime immediately and then every second
     updateDateTime();
-        function toggleDarkMode() {
-            document.body.classList.toggle("dark-mode");
-        }
+    setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
