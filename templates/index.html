@@ -9,10 +9,26 @@
     <link rel="shortcut icon" href="/static/favicon.ico">
 
     <style>
+        :root {
+            --bg-color: #eef2f7;
+            --text-color: #333;
+            --container-bg: white;
+            --btn-bg: linear-gradient(90deg, #007BFF, #0056b3);
+            --btn-hover: #0056b3;
+        }
+
+        .dark-mode {
+            --bg-color: #1e1e1e;
+            --text-color: #f1f1f1;
+            --container-bg: #2c2c2c;
+            --btn-bg: linear-gradient(90deg, #444, #222);
+            --btn-hover: #111;
+        }
+
         body {
             font-family: 'Roboto', Arial, sans-serif;
-            background: linear-gradient(to right, #eef2f7, #d9e2ec);
-            color: #333;
+            background: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
         }
@@ -35,7 +51,7 @@
             max-width: 800px;
             margin: 20px auto;
             padding: 20px;
-            background: white;
+            background: var(--container-bg);
             border-radius: 12px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
             text-align: center;
@@ -49,7 +65,7 @@
             overflow-y: auto;
             padding: 15px;
             border-radius: 10px;
-            background-color: #f9f9f9;
+            background-color: var(--container-bg);
             border: 1px solid #ddd;
             margin-bottom: 20px;
         }
@@ -62,6 +78,8 @@
             display: block;
             margin: 0 auto 10px;
             transition: border 0.3s ease-in-out;
+            background: var(--container-bg);
+            color: var(--text-color);
         }
         .input-box:focus {
             border-color: #007BFF;
@@ -71,7 +89,7 @@
             padding: 12px;
             border: none;
             border-radius: 8px;
-            background: linear-gradient(90deg, #007BFF, #0056b3);
+            background: var(--btn-bg);
             color: white;
             font-size: 16px;
             cursor: pointer;
@@ -80,12 +98,12 @@
             margin: 0 auto;
         }
         .btn:hover {
-            background: #0056b3;
+            background: var(--btn-hover);
         }
         .section {
             margin-top: 20px;
             padding: 15px;
-            background: white;
+            background: var(--container-bg);
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
@@ -103,6 +121,7 @@
 <body>
     <header>Welcome to Lumi - Your AI Chatbot</header>
     <div class="date-time" id="date-time">Loading date & time...</div>
+    <button class="btn" onclick="toggleDarkMode()">Toggle Dark Mode</button>
     <div class="container">
         <h1>Lumi - Your AI Chatbot</h1>
         <div class="chat-box" id="chat-box">
@@ -113,7 +132,7 @@
     </div>
     <div class="container section">
         <h2>How Lumi Works</h2>
-        <p>Lumi is powered by OpenAI's GPT-4, allowing it to process and generate human-like text responses. When you type a message, it sends the input to OpenAI's servers, where a deep learning model analyzes your query and provides a relevant response.</p>
+        <p>Lumi is powered by OpenAI's GPT-4o, allowing it to process and generate human-like text responses. When you type a message, it sends the input to OpenAI's servers, where a deep learning model analyzes your query and provides a relevant response.</p>
     </div>
     <div class="container section">
         <h2>Developers</h2>
@@ -124,56 +143,43 @@
     <script>
         let chatHistory = [];
 
-function sendMessage() {
-    var userInput = document.getElementById("user-input").value.trim();
-    if (userInput === "") return;
+        function sendMessage() {
+            var userInput = document.getElementById("user-input").value.trim();
+            if (userInput === "") return;
 
-    var chatBox = document.getElementById("chat-box");
-    chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+            var chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+            chatHistory.push({ role: "user", content: userInput });
 
-    // Add user message to history
-    chatHistory.push({ role: "user", content: userInput });
+            fetch('/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: chatHistory })
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatBox.innerHTML += `<p><strong>Lumi:</strong> ${data.response}</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                chatHistory.push({ role: "assistant", content: data.response });
+            })
+            .catch(() => {
+                chatBox.innerHTML += `<p><strong>Lumi:</strong> Error processing request.</p>`;
+            });
 
-    fetch('/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chatHistory })  // Send entire chat history
-    })
-    .then(response => response.json())
-    .then(data => {
-        chatBox.innerHTML += `<p><strong>Lumi:</strong> ${data.response}</p>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
+            document.getElementById("user-input").value = "";
+        }
 
-        // Add AI response to history
-        chatHistory.push({ role: "assistant", content: data.response });
-    })
-    .catch(() => {
-        chatBox.innerHTML += `<p><strong>Lumi:</strong> Error processing request.</p>`;
-    });
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById("date-time").textContent = now.toLocaleString("en-US", options);
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
 
-    document.getElementById("user-input").value = "";  // Clear input field
-}
-
-// Function to update date & time dynamically
-function updateDateTime() {
-    const now = new Date();
-    const options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit',
-        hour12: true // Ensures AM/PM format
-    };
-    document.getElementById("date-time").textContent = now.toLocaleString("en-US", options);
-}
-
-
-// Run time function every second
-setInterval(updateDateTime, 1000);
-updateDateTime();
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
     </script>
 </body>
 </html>
