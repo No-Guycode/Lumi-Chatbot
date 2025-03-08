@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Set your OpenAI API key here
+# Set OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route('/')
@@ -13,16 +13,17 @@ def index():
 
 @app.route('/query', methods=['POST'])
 def query():
-    user_prompt = request.form.get('prompt', '')
-    if not user_prompt:
+    data = request.json
+    messages = data.get("messages", [])
+
+    if not messages:
         return jsonify({'response': 'Please enter a message.'})
-    
+
     try:
         client = openai.OpenAI(api_key=openai.api_key)
         response = client.chat.completions.create(
-            model="gpt-4",  # Change to "gpt-3.5-turbo" for a cheaper option
-            messages=[{"role": "system", "content": "You are Lumi, a helpful chatbot."},
-                      {"role": "user", "content": user_prompt}]
+            model="gpt-4o",
+            messages=messages  # Send full conversation history
         )
         bot_reply = response.choices[0].message.content
         return jsonify({'response': bot_reply})
