@@ -100,6 +100,22 @@
         .btn:hover {
             background: var(--btn-hover);
         }
+        .toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 6px;
+            background: var(--btn-bg);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+        .toggle-btn:hover {
+            background: var(--btn-hover);
+        }
         .section {
             margin-top: 20px;
             padding: 15px;
@@ -121,7 +137,6 @@
 <body>
     <header>Welcome to Lumi - Your AI Chatbot</header>
     <div class="date-time" id="date-time">Loading date & time...</div>
-    <button class="btn" onclick="toggleDarkMode()">Toggle Dark Mode</button>
     <div class="container">
         <h1>Lumi - Your AI Chatbot</h1>
         <div class="chat-box" id="chat-box">
@@ -132,7 +147,7 @@
     </div>
     <div class="container section">
         <h2>How Lumi Works</h2>
-        <p>Lumi is powered by OpenAI's GPT-4o, allowing it to process and generate human-like text responses. When you type a message, it sends the input to OpenAI's servers, where a deep learning model analyzes your query and provides a relevant response.</p>
+        <p>Lumi is powered by OpenAI's GPT-4, allowing it to process and generate human-like text responses. When you type a message, it sends the input to OpenAI's servers, where a deep learning model analyzes your query and provides a relevant response.</p>
     </div>
     <div class="container section">
         <h2>Developers</h2>
@@ -140,8 +155,10 @@
         <p>Muhammad Rayyan</p>
     </div>
     <footer>&copy; 2025 Lumi Chatbot Team. All rights reserved.</footer>
+    <button class="toggle-btn" onclick="toggleDarkMode()">🌙</button>
     <script>
         let chatHistory = [];
+        const MAX_HISTORY = 10; 
 
         function sendMessage() {
             var userInput = document.getElementById("user-input").value.trim();
@@ -151,31 +168,10 @@
             chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
             chatHistory.push({ role: "user", content: userInput });
 
-            fetch('/query', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: chatHistory })
-            })
-            .then(response => response.json())
-            .then(data => {
-                chatBox.innerHTML += `<p><strong>Lumi:</strong> ${data.response}</p>`;
-                chatBox.scrollTop = chatBox.scrollHeight;
-                chatHistory.push({ role: "assistant", content: data.response });
-            })
-            .catch(() => {
-                chatBox.innerHTML += `<p><strong>Lumi:</strong> Error processing request.</p>`;
-            });
-
-            document.getElementById("user-input").value = "";
+            if (chatHistory.length > MAX_HISTORY * 2) {
+                chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
+            }
         }
-
-        function updateDateTime() {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            document.getElementById("date-time").textContent = now.toLocaleString("en-US", options);
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
 
         function toggleDarkMode() {
             document.body.classList.toggle("dark-mode");
