@@ -18,12 +18,13 @@ def query():
         return jsonify({'response': 'Please enter a message.'})
     
     try:
-        response = openai.ChatCompletion.create(
+        client = openai.OpenAI(api_key=openai.api_key)
+        response = client.chat.completions.create(
             model="gpt-4",  # Change to "gpt-3.5-turbo" for a cheaper option
             messages=[{"role": "system", "content": "You are Lumi, a helpful chatbot."},
                       {"role": "user", "content": user_prompt}]
         )
-        bot_reply = response['choices'][0]['message']['content']
+        bot_reply = response.choices[0].message.content
         return jsonify({'response': bot_reply})
     except Exception as e:
         return jsonify({'response': f'Error: {str(e)}'})
