@@ -146,6 +146,14 @@
         <button class="btn" onclick="sendMessage()">Send</button>
     </div>
     <div class="container section">
+    <h2>Select AI Model</h2>
+    <select id="model-select" class="input-box">
+        <option value="gpt-4o">GPT-4o</option>
+        <option value="gpt-4">GPT-4</option>
+        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+    </select>
+    </div>
+    <div class="container section">
         <h2>How Lumi Works</h2>
         <p>Lumi is powered by OpenAI's GPT-4, allowing it to process and generate human-like text responses. When you type a message, it sends the input to OpenAI's servers, where a deep learning model analyzes your query and provides a relevant response.</p>
     </div>
@@ -160,18 +168,44 @@
         let chatHistory = [];
         const MAX_HISTORY = 10; 
 
-        function sendMessage() {
-            var userInput = document.getElementById("user-input").value.trim();
-            if (userInput === "") return;
+       function sendMessage() {
+    var userInput = document.getElementById("user-input").value.trim();
+    var selectedModel = document.getElementById("model-select").value;
+    if (userInput === "") return;
 
-            var chatBox = document.getElementById("chat-box");
-            chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
-            chatHistory.push({ role: "user", content: userInput });
+    var chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
 
-            if (chatHistory.length > MAX_HISTORY * 2) {
-                chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
-            }
+    // Add user message to history
+    chatHistory.push({ role: "user", content: userInput });
+
+    // Ensure chat history does not exceed MAX_HISTORY turns (each turn = 1 user + 1 assistant message)
+    if (chatHistory.length > MAX_HISTORY * 2) {
+        chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
+    }
+
+    fetch("/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: chatHistory, model: selectedModel })
+    })
+    .then(response => response.json())
+    .then(data => {
+        chatBox.innerHTML += `<p><strong>Lumi:</strong> ${data.response}</p>`;
+
+        // Add assistant message to history
+        chatHistory.push({ role: "assistant", content: data.response });
+
+        // Again, trim the history if needed
+        if (chatHistory.length > MAX_HISTORY * 2) {
+            chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
         }
+    })
+    .catch(error => {
+        chatBox.innerHTML += `<p><strong>Error:</strong> Failed to fetch response.</p>`;
+    });
+}
+
 
         function toggleDarkMode() {
             document.body.classList.toggle("dark-mode");
