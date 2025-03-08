@@ -15,6 +15,7 @@ def index():
 def query():
     data = request.json
     messages = data.get("messages", [])
+    model = data.get("model", "gpt-4o")  # Default to GPT-4o
 
     if not messages:
         return jsonify({'response': 'Please enter a message.'})
@@ -22,8 +23,8 @@ def query():
     try:
         client = openai.OpenAI(api_key=openai.api_key)
         response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages  # Send full conversation history
+            model=model,  # Use the selected model
+            messages=messages
         )
         bot_reply = response.choices[0].message.content
         return jsonify({'response': bot_reply})
