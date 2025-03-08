@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: 'Roboto', Arial, sans-serif;
-            background-color: #f4f7fc;
+            background: linear-gradient(to right, #eef2f7, #d9e2ec);
             color: #333;
             margin: 0;
             padding: 0;
@@ -18,36 +18,47 @@
             color: white;
             text-align: center;
             padding: 20px;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         .container {
             max-width: 800px;
             margin: 20px auto;
             padding: 20px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+        .container:hover {
+            transform: scale(1.02);
         }
         .chat-box {
             max-height: 400px;
             overflow-y: auto;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
             background-color: #f9f9f9;
             border: 1px solid #ddd;
             margin-bottom: 20px;
         }
         .input-box {
-            width: 100%;
+            width: 90%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 16px;
+            display: block;
+            margin: 0 auto 10px;
+            transition: border 0.3s ease-in-out;
+        }
+        .input-box:focus {
+            border-color: #007BFF;
         }
         .btn {
-            width: 100%;
+            width: 90%;
             padding: 12px;
             border: none;
             border-radius: 8px;
@@ -55,10 +66,20 @@
             color: white;
             font-size: 16px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: background 0.3s ease-in-out;
+            display: block;
+            margin: 0 auto;
         }
         .btn:hover {
             background: #0056b3;
+        }
+        .section {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         footer {
             text-align: center;
@@ -79,6 +100,15 @@
         </div>
         <input type="text" id="user-input" class="input-box" placeholder="Type your message...">
         <button class="btn" onclick="sendMessage()">Send</button>
+    </div>
+    <div class="container section">
+        <h2>How Lumi Works</h2>
+        <p>Lumi is powered by OpenAI's GPT-4, allowing it to process and generate human-like text responses. When you type a message, it sends the input to OpenAI's servers, where a deep learning model analyzes your query and provides a relevant response.</p>
+    </div>
+    <div class="container section">
+        <h2>Developers</h2>
+        <p>Ahmed Bin Nabeel</p>
+        <p>Muhammad Rayyan</p>
     </div>
     <footer>&copy; 2025 Lumi Chatbot Team. All rights reserved.</footer>
     <script>
@@ -106,3 +136,4 @@
     </script>
 </body>
 </html>
+
