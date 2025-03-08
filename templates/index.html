@@ -122,34 +122,38 @@
     </div>
     <footer>&copy; 2025 Lumi Chatbot Team. All rights reserved.</footer>
     <script>
-        function sendMessage() {
-            var userInput = document.getElementById("user-input").value;
-            if (userInput.trim() !== "") {
-                var chatBox = document.getElementById("chat-box");
-                chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
-                fetch('/query', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ 'prompt': userInput })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    chatBox.innerHTML += `<p><strong>Lumi:</strong> ${data.response}</p>`;
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                })
-                .catch(() => {
-                    chatBox.innerHTML += `<p><strong>Lumi:</strong> Error processing request.</p>`;
-                });
-            }
-            document.getElementById("user-input").value = "";
-        }
-        function updateDateTime() {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            document.getElementById("date-time").textContent = now.toLocaleDateString("en-US", options);
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
+        let chatHistory = [];
+
+function sendMessage() {
+    var userInput = document.getElementById("user-input").value.trim();
+    if (userInput === "") return;
+
+    var chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+
+    // Add user message to history
+    chatHistory.push({ role: "user", content: userInput });
+
+    fetch('/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chatHistory })  // Send entire chat history
+    })
+    .then(response => response.json())
+    .then(data => {
+        chatBox.innerHTML += `<p><strong>Lumi:</strong> ${data.response}</p>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Add AI response to history
+        chatHistory.push({ role: "assistant", content: data.response });
+    })
+    .catch(() => {
+        chatBox.innerHTML += `<p><strong>Lumi:</strong> Error processing request.</p>`;
+    });
+
+    document.getElementById("user-input").value = "";  // Clear input field
+}
+
     </script>
 </body>
 </html>
