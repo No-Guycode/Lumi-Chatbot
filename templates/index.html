@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0;url='/'">
     <title>Lumi - Your AI Chatbot</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
@@ -25,6 +24,12 @@
             font-size: 28px;
             font-weight: bold;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .date-time {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin-top: 20px;
         }
         .container {
             max-width: 800px;
@@ -97,6 +102,7 @@
 </head>
 <body>
     <header>Welcome to Lumi - Your AI Chatbot</header>
+    <div class="date-time" id="date-time">Loading date & time...</div>
     <div class="container">
         <h1>Lumi - Your AI Chatbot</h1>
         <div class="chat-box" id="chat-box">
@@ -137,7 +143,13 @@
             }
             document.getElementById("user-input").value = "";
         }
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById("date-time").textContent = now.toLocaleDateString("en-US", options);
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
     </script>
 </body>
 </html>
-
