@@ -205,8 +205,17 @@
         chatBox.innerHTML += `<p><strong>Error:</strong> Failed to fetch response.</p>`;
     });
 }
+    function updateDateTime() {
+        const now = new Date();
+        const formattedDateTime = now.toLocaleString(); // Formats based on the user's locale
+        document.getElementById("date-time").textContent = formattedDateTime;
+    }
 
+    // Update time every second
+    setInterval(updateDateTime, 1000);
 
+    // Set time immediately on page load
+    updateDateTime();
         function toggleDarkMode() {
             document.body.classList.toggle("dark-mode");
         }
