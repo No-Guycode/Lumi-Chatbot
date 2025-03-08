@@ -4,7 +4,10 @@ import os
 
 app = Flask(__name__)
 
-# Set OpenAI API key
+# Ensure OpenAI API Key is set
+if not os.getenv("OPENAI_API_KEY"):
+    raise ValueError("Missing OpenAI API Key. Set OPENAI_API_KEY in environment variables.")
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route('/')
@@ -21,12 +24,11 @@ def query():
         return jsonify({'response': 'Please enter a message.'})
 
     try:
-        client = openai.OpenAI(api_key=openai.api_key)
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model=model,  # Use the selected model
             messages=messages
         )
-        bot_reply = response.choices[0].message.content
+        bot_reply = response["choices"][0]["message"]["content"]
         return jsonify({'response': bot_reply})
     except Exception as e:
         return jsonify({'response': f'Error: {str(e)}'})
