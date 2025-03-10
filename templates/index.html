@@ -167,8 +167,7 @@
     <script>
         let chatHistory = [];
         const MAX_HISTORY = 10; 
-
-       function sendMessage() {
+function sendMessage() {
     var userInput = document.getElementById("user-input").value.trim();
     var selectedModel = document.getElementById("model-select").value;
     if (userInput === "") return;
@@ -179,7 +178,7 @@
     // Add user message to history
     chatHistory.push({ role: "user", content: userInput });
 
-    // Ensure chat history does not exceed MAX_HISTORY turns (each turn = 1 user + 1 assistant message)
+    // Ensure chat history does not exceed MAX_HISTORY turns
     if (chatHistory.length > MAX_HISTORY * 2) {
         chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
     }
@@ -196,15 +195,22 @@
         // Add assistant message to history
         chatHistory.push({ role: "assistant", content: data.response });
 
-        // Again, trim the history if needed
+        // Ensure chat history does not exceed MAX_HISTORY turns
         if (chatHistory.length > MAX_HISTORY * 2) {
             chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
         }
+
+        // ✅ Auto-scroll to the latest message
+        chatBox.scrollTop = chatBox.scrollHeight;
     })
     .catch(error => {
         chatBox.innerHTML += `<p><strong>Error:</strong> Failed to fetch response.</p>`;
     });
-}
+
+    // Clear input field
+    document.getElementById("user-input").value = "";
+} // End of sendMessage()
+
 
     function updateDateTime() {
         try {
